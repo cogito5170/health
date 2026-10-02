@@ -27,7 +27,7 @@ L0 Telemetry ─► L1 Sensor (MEASURE · 탐지 판독) ─► L2 State (ESTIMA
 | BD-35 | 건강 성격 상태(`execution_health` · `tool_execution_health` · `execution_interruption` · `runtime_reliability` · `answer_reliability` · `correction_rate`)는 이름 · 값 그대로, 소유 층 표시만 ASSESS |
 | BD-36 | `confidence{kind: none · ordinal · calibrated}` — 보정 전 Q 는 ordinal, Guard · 정책의 문턱으로 못 쓴다 |
 | BD-39 | 필수 예산이 빠진 배치는 ASSESS 의 설정 적합성 고장 상태 |
-| BD-99 | ASSESS 표시 상태 여섯은 모두 Sensor 의 탐지다. Health 는 Sensor state-export(+ 관계)만 읽는다. VERIFY 근거는 값 없이 참조 · 실체 `action:<run>:<command_id>` · 사후조건의 집은 DC `purpose.ActionSpec` · S6 = 실행됐나, VERIFY = 효과가 났나 |
+| BD-99 | ASSESS 표시 상태 여섯은 모두 Sensor 의 탐지다. Health 는 Sensor state-export(+ 관계)만 읽는다. VERIFY 근거는 값 없이 참조 · 실체 `action:<run>:<command_id>` · 사후조건의 집은 **보류**(BD-100 — 실행기를 지을 때 행동 명세 통합과 함께) · 사후조건 절은 MS 술어 꼴(BD-100) · S6 = 실행됐나, VERIFY = 효과가 났나 |
 | BD-46 | MS 가 제안한 `outcome_confidence` · `false_success_risk` · `loop_risk` · `cost_anomaly` 는 Sensor(L1 · L2) 또는 Health 의 일 |
 | BD-52 → BD-99 | `liveness_state` 는 Sensor 에 남는다(BD-99 가 "옮긴다" 를 거둠). "대상이 죽었나 · 수집이 죽었나" 를 가르는 진단이 Health 몫 |
 | BD-31 · BD-97 | VERIFY: ActionSpec 사후조건 · 시간 창을 그 뒤의 State 와 견줘 `action_state` 를 낸다. 입력 이름은 L0 `action.*`. 실행기가 선 뒤 |

@@ -132,5 +132,5 @@ ActionOutcome / L0 action.result ── 명령이 같은지만 본다. 판정에
   - `action_state` State 를 내보내는 일 — State 꼴은 Sensor 와 같은 것을 쓴다. 이 기록을 State 로 옮기는 길은 소비자(DC `HealthSource`)와 함께 정한다.
   - C11 실행기 고장 후보 진단.
   - 실데이터 — 실행기 · ActionSpec 사후조건이 아직 없다.
-- 사후조건은 시험의 고정값이다. 집은 DC `purpose.ActionSpec` 이다(BD-99). DC 에 넣는 일은 실행기와 함께 지시된다.
+- 사후조건은 시험의 고정값이다. 집(DC `purpose.ActionSpec` 대 MS `ToolSpec`)은 **보류**다(BD-100: BD-99 의 "집은 DC" 를 고침). 실행기를 지을 때 행동 명세 통합과 함께 정한다. 어느 쪽이든 절의 꼴(`{entity, pred}`, MS 술어)은 같다.
 - 표준 라이브러리와 action 계약만 쓴다. 다른 저장소는 고치지 않았다.
