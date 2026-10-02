@@ -8,8 +8,8 @@ version = "0.1.0"
 description = "Health -- ASSESS 진단 · 격리 · VERIFY. 지금은 verification-record/1 꼴과 순수 판정 함수. 표준 라이브러리 + action 계약"
 readme = "README.md"
 requires-python = ">=3.10"
-# action-contract/1 (BD-96) -- 필수. 바뀌지 않는 커밋 sha 로 고정한다(BD-68 · BD-92 와 같은 방식, baseline#9 CMD-H2)
-dependencies = ["action-contract @ git+https://github.com/cogito5170/action@443f8eb810ce3cb9677cdc9f564ff79790f9c2ec"]
+# action-contract/1 (BD-96) -- 필수. 바뀌지 않는 커밋 sha 로 고정한다(BD-68 · BD-92 와 같은 방식, baseline#9 CMD-H2 → CMD-H3 에서 3995fdb 로)
+dependencies = ["action-contract @ git+https://github.com/cogito5170/action@3995fdb3ba487f31d841d3e11b710e64f0d523db"]
 
 [tool.setuptools]
 packages = ["health"]

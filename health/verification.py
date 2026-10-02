@@ -16,7 +16,7 @@
     - 관측 시각 ≥ 명령 발행 시각 -- **명령 전 관측은 효과의 근거가 아니다**  아니면 NO_POST_OBSERVATION
     - 관측 시각 ≤ 판정 시각                                      아니면 NOT_USABLE
     - 유효성 OBSERVED · DERIVED · INFERRED, 신선도 FRESH · PERMANENT  아니면 NOT_USABLE
-술어는 쓸 만한 값에만 적용한다(MS `holds` 는 값이 없으면 거짓이라 '모름' 이 '거짓' 이 된다).
+술어는 쓸 만한 값에만 적용한다(술어 한 벌(action.predicate)의 `holds` 는 값이 없으면 거짓이라 '모름' 이 '거짓' 이 된다).
 
 **실행기의 결과(ActionOutcome = L0 action.result)는 판정에 들어가지 않는다.** "됐다" 는 관측일 뿐이다(DATA_FLOW §7).
 `outcome` 을 받는 것은 명령과 같은 것을 가리키는지 확인하려는 것뿐이고, 기록에는 `outcome_ref`(사건 id)만 남는다.

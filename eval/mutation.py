@@ -50,11 +50,13 @@ MUTANTS = [
      'keys = {"clause", "entity", "state", "observed_at", "time_base", "value"}'),
     ("해시가 칸 하나(evaluated_at)를 빠뜨림", V, "for f in fields(self)}", 'for f in fields(self) if f.name != "evaluated_at"}'),
     ("모르는 실체 지정을 받음", V, 'elif ent.startswith("$") and ent != "$target"', "elif False"),
-    # ── 술어 ──
-    ("값이 없어도 견줌", P, "    if values.get(prop) is None:\n        return False\n", ""),
-    ("in 을 뒤집음", P, '"in": lambda a, b: a in b,', '"in": lambda a, b: a not in b,'),
-    ("속성 참조를 받음", P, '        return [f"속성 참조는 verification-record/1 에서 받지 않는다: {pred!r}"]', "        pass"),
-    ("견줄 수 없으면 참", P, "    except TypeError:\n        return False", "    except TypeError:\n        return True"),
+    # ── 술어(action 한 벌을 사후조건 모드로 묶음, CMD-H3) ──
+    ("술어가 속성 참조를 받음(refs)", P, "_one.check(pred, refs=False, named=True)", "_one.check(pred, refs=True, named=True)"),
+    ("술어가 빈 상태 이름을 받음(named)", P, "_one.check(pred, refs=False, named=True)", "_one.check(pred, refs=False, named=False)"),
+    ("값이 없어도 참(한 벌을 덮어씀)", P, "holds = _one.holds\n",
+     "holds = lambda p, v: _one.holds(p, v) or v.get(p[0]) is None\n"),
+    ("in 을 뒤집음(한 벌을 덮어씀)", P, "holds = _one.holds\n",
+     "holds = lambda p, v: (not _one.holds(p, v)) if p[1] == 'in' else _one.holds(p, v)\n"),
 ]
 
 

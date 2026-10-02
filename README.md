@@ -27,7 +27,7 @@ L0 Telemetry ─► L1 Sensor (MEASURE · 탐지 판독) ─► L2 State (ESTIMA
 | BD-35 | 건강 성격 상태(`execution_health` · `tool_execution_health` · `execution_interruption` · `runtime_reliability` · `answer_reliability` · `correction_rate`)는 이름 · 값 그대로, 소유 층 표시만 ASSESS |
 | BD-36 | `confidence{kind: none · ordinal · calibrated}` — 보정 전 Q 는 ordinal, Guard · 정책의 문턱으로 못 쓴다 |
 | BD-39 | 필수 예산이 빠진 배치는 ASSESS 의 설정 적합성 고장 상태 |
-| BD-99 | ASSESS 표시 상태 여섯은 모두 Sensor 의 탐지다. Health 는 Sensor state-export(+ 관계)만 읽는다. VERIFY 근거는 값 없이 참조 · 실체 `action:<run>:<command_id>` · 사후조건의 집은 **보류**(BD-100 — 실행기를 지을 때 행동 명세 통합과 함께) · 사후조건 절은 MS 술어 꼴(BD-100) · S6 = 실행됐나, VERIFY = 효과가 났나 |
+| BD-99 | ASSESS 표시 상태 여섯은 모두 Sensor 의 탐지다. Health 는 Sensor state-export(+ 관계)만 읽는다. VERIFY 근거는 값 없이 참조 · 실체 `action:<run>:<command_id>` · 사후조건의 집은 action `ActionSpec`(BD-109) · 사후조건 절은 MS 술어 꼴(BD-100) · S6 = 실행됐나, VERIFY = 효과가 났나 |
 | BD-46 | MS 가 제안한 `outcome_confidence` · `false_success_risk` · `loop_risk` · `cost_anomaly` 는 Sensor(L1 · L2) 또는 Health 의 일 |
 | BD-52 → BD-99 | `liveness_state` 는 Sensor 에 남는다(BD-99 가 "옮긴다" 를 거둠). "대상이 죽었나 · 수집이 죽었나" 를 가르는 진단이 Health 몫 |
 | BD-31 · BD-97 | VERIFY: ActionSpec 사후조건 · 시간 창을 그 뒤의 State 와 견줘 `action_state` 를 낸다. 입력 이름은 L0 `action.*`. 실행기가 선 뒤 |
@@ -36,12 +36,13 @@ L0 Telemetry ─► L1 Sensor (MEASURE · 탐지 판독) ─► L2 State (ESTIMA
 ## 지금 있는 것
 
 - `health/verification.py` — VERIFY 기록 꼴 `verification-record/1` 과 순수 판정 함수 `verify` (CMD-H2). 계약: [`docs/VERIFICATION.md`](docs/VERIFICATION.md)
-- `health/predicate.py` — 사후조건 술어. MS `ms/predicate.py` 꼴 그대로(속성 참조 제외)
-- 의존: action 계약(`action-contract/1`) — 커밋 sha 고정, 필수. 그 밖에는 표준 라이브러리만
+- `health/predicate.py` — 사후조건 술어. 자기 구현 없이 action 한 벌(`action.predicate`)을 사후조건 모드(`refs=False · named=True`)로 묶는다(CMD-H3)
+- 의존: action(`action-contract/1` · 술어 한 벌 · `action-spec/1`) — 커밋 `3995fdb` 고정, 필수. 그 밖에는 표준 라이브러리만
 
 ```
-pip install -e .                       # action 계약을 고정 sha 로 받는다
+pip install -e .                       # action 을 고정 sha 로 받는다. 앞서 다른 sha 를 깔았으면 --force-reinstall (action 판 번호가 0.1.0 그대로다)
 python3 -m unittest                    # 옆에 MS 가 있으면(../MS · MS_REPO) 술어 대조도 돈다
+python3 eval/predicate_migration.py    # 술어를 옮기기 전(a07d833)과 판정이 같은가
 python3 eval/mutation.py               # 변이가 모두 RED 여야 한다
 ```
 

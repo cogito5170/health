@@ -56,9 +56,10 @@ ActionOutcome / L0 action.result ── 명령이 같은지만 본다. 판정에
 
 ## 2. 사후조건 절
 
-- `pred` 는 **MS `ms/predicate.py` 의 술어 꼴 그대로**다: `[상태, 연산, 값]`. 연산은 `== != < <= > >= in not_in` · `exists missing`.
+- `pred` 는 **action 의 술어 한 벌**(`action.predicate`, BD-108)이다: `[상태, 연산, 값]`. 연산은 `== != < <= > >= in not_in` · `exists missing`.
+  - 원본은 MS `ms/predicate.py` 이고, MS · guard 도 이제 그 한 벌을 쓴다. health 에는 자기 구현이 없다(CMD-H3). `health/predicate.py` 는 그 한 벌을 **사후조건 모드** `check(p, refs=False, named=True)` 로 묶을 뿐이다.
   - 사전조건 · 파생 상태 · 질의가 이미 이 꼴을 쓴다. 새 꼴을 짓지 않는다.
-  - 옆에 MS 가 있으면 시험이 같은 뜻인지 대조한다.
+  - 옮기기 전(자기 술어, `a07d833`)과 판정이 같음은 `eval/predicate_migration.py` 가 보인다.
 - **다른 점 하나**: 값 자리의 속성 참조(`{"prop", "mul"}`)는 받지 않는다. 절은 한 실체의 한 상태만 본다.
 - `entity` 의 지정은 셋 중 하나다.
 
@@ -83,7 +84,7 @@ ActionOutcome / L0 action.result ── 명령이 같은지만 본다. 판정에
 5. 관측 시각 ≤ 판정 시각 → 아니면 `NOT_USABLE`
 6. 유효성이 OBSERVED · DERIVED · INFERRED 가운데 하나이고, 신선도가 FRESH · PERMANENT 다 → 아니면 `NOT_USABLE`
 
-**술어는 쓸 만한 값에만 적용한다.** MS `holds` 는 값이 없으면 거짓이다. 그대로 쓰면 '모름' 이 NOT_VERIFIED 로 간다.
+**술어는 쓸 만한 값에만 적용한다.** 한 벌의 `holds` 는 값이 없으면 거짓이다. 그대로 쓰면 '모름' 이 NOT_VERIFIED 로 간다.
 
 **결과.** 위에서부터 처음 맞는 것이다.
 
@@ -111,7 +112,10 @@ ActionOutcome / L0 action.result ── 명령이 같은지만 본다. 판정에
 | 판정에 쓰는 값 | — | — | — | — | `read` 의 `value` · `status` · `freshness` (기록에는 남기지 않는다) |
 | `outcome_ref` | — | — | 사건 id | (판정에 쓰지 않음) | — |
 
-- **의존**: action 계약(`action-contract/1`)은 **필수 의존**이고, 커밋 `443f8eb810ce3cb9677cdc9f564ff79790f9c2ec` 에 고정한다(`pyproject.toml`).
+- **의존**: action 계약(`action-contract/1`)은 **필수 의존**이고, 커밋 `3995fdb3ba487f31d841d3e11b710e64f0d523db` 에 고정한다(`pyproject.toml`, CMD-H3 — 그 전은 `443f8eb`). 꼴(`action.forms`) · 정준 JSON · 술어 한 벌 · 행동 명세(`action.spec`)를 거기서 쓴다.
+- **행동 명세와의 이음**: 사후조건 · 창의 집은 action `ActionSpec`(`action-spec/1`, BD-109)이다. `verify(cmd, ..., **action.spec.verify_args(spec))` 로 그대로 부른다(`tests/test_spec.py`).
+  - 사후조건이 없는 명세는 `window_ms` 가 None 이라 `verify` 가 거절한다(창 없이 기록을 지을 수 없다). 부르는 쪽이 사후조건 없는 행동은 부르지 않는 것으로 본다 — baseline 판단 대기.
+  - 명세는 실체 id 에 빈칸을 거절하고 `verify` 는 받는다. 명세를 지난 절만 오므로 판정에는 영향이 없다.
 - **Sensor 는 import 하지 않는다.** state-export `read` 의 결과(dict)만 받는다(BD-99 입력 원칙).
 - S6(Sensor 의 "실행됐나")이 서면 그 상태도 같은 길로 읽는다(BD-99 의 6).
 
@@ -127,10 +131,10 @@ ActionOutcome / L0 action.result ── 명령이 같은지만 본다. 판정에
 
 ## 6. 범위
 
-- **지었다**: 꼴 · 판정 함수 · 술어(MS 꼴, 일부).
+- **지었다**: 꼴 · 판정 함수. 술어는 action 한 벌을 쓴다(CMD-H3).
 - **짓지 않았다**
   - `action_state` State 를 내보내는 일 — State 꼴은 Sensor 와 같은 것을 쓴다. 이 기록을 State 로 옮기는 길은 소비자(DC `HealthSource`)와 함께 정한다.
   - C11 실행기 고장 후보 진단.
   - 실데이터 — 실행기 · ActionSpec 사후조건이 아직 없다.
-- 사후조건은 시험의 고정값이다. 집(DC `purpose.ActionSpec` 대 MS `ToolSpec`)은 **보류**다(BD-100: BD-99 의 "집은 DC" 를 고침). 실행기를 지을 때 행동 명세 통합과 함께 정한다. 어느 쪽이든 절의 꼴(`{entity, pred}`, MS 술어)은 같다.
+- 사후조건의 집은 action `ActionSpec` 으로 정해졌다(BD-109 — BD-100 의 보류를 풀었다). 실데이터 VERIFY 는 MS 가 런타임에서 부를 때부터다(CMD-M23).
 - 표준 라이브러리와 action 계약만 쓴다. 다른 저장소는 고치지 않았다.
