@@ -93,7 +93,7 @@ action 꼴과 같은 방식으로 짓는다.
 | `verification_id` | `ver-` + 16 hex | 내용 해시(아래 칸 전부) |
 | `command_id` | `cmd-` + 16 hex | 검증하는 명령. = ActionCommand.`command_id` = L0 `action.*`.`action_ref` (CMD-T16) |
 | `spec` | `"<ActionSpec 이름>@<판본>"` | 어느 사후조건으로 판정했나. 명령의 `action` 과 이름이 같다 |
-| `postcondition` | [절] | 모든 절이 성립해야 한다(논리곱). 절 = `{"entity": <실체 지정>, "state": <상태 이름>, "in": [<값>…]}`. 실체 지정은 셋 중 하나다: `"$target"`(명령의 겨냥) · `"$run.<역할>"`(state-export `subjects` 의 agent · task · runtime) · 실체 id 그대로. **코드 · 식은 받지 않는다** — 재생과 결정론 때문이다 |
+| `postcondition` | [절] | 모든 절이 성립해야 한다(논리곱). 절 = `{"entity": <실체 지정>, "pred": [<상태 이름>, <연산>, <값>]}`. `pred` 는 **MS `ms/predicate.py` 의 술어 꼴 그대로**다(사전조건 · 파생 상태 · 질의 거르개가 이미 쓴다, 연산 `== != < <= > >= in not_in exists missing`). 사후조건에 새 술어 꼴을 짓지 않는다(DUP). 실체 지정은 셋 중 하나다: `"$target"`(명령의 겨냥) · `"$run.<역할>"`(state-export `subjects` 의 agent · task · runtime) · 실체 id 그대로. **코드 · 식은 받지 않는다** — 재생과 결정론 때문이다 |
 | `window` | `{"start_ms", "end_ms", "time_base": "unix_ms"}` | `start_ms` = 명령 `issued_at`. `end_ms` = `start_ms` + ActionSpec 의 창. 명령의 `deadline` 과는 다르다(그것은 실행기의 기한) |
 | `outcome_ref` | str \| null | L0 `action.result` 사건 id(`action_ref` = `command_id`). 못 봤으면 null. 내용은 복사하지 않는다 |
 | `evidence` | [근거] | 절마다 하나: `{"clause", "entity", "state", "value", "status", "freshness", "observed_at", "time_base", "rule": "<id>@<판본>", "evidence_refs"}`. state-export `read` 의 칸을 줄인 것이다 |
@@ -112,11 +112,12 @@ action 꼴과 같은 방식으로 짓는다.
    - freshness 가 FRESH 나 PERMANENT 다(UNTIMED 는 창과 견줄 수 없다).
    - `observed_at ≥ window.start_ms` 이고, 시각 기준이 `unix_ms` 다.
    - **명령 전에 관측된 상태는 효과의 근거가 아니다.** 실행 전부터 참이던 값이 "검증됨" 을 만들면 안 된다.
-3. 모든 절이 쓸 만하고 값이 `in` 안에 있다 → `VERIFIED / MET`, final.
+3. 모든 절이 쓸 만하고 술어가 참이다 → `VERIFIED / MET`, final.
+   - 술어는 **쓸 만한 값에만** 적용한다. MS `predicate.holds` 는 값이 없으면 거짓이다. 그대로 쓰면 "모름" 이 NOT_VERIFIED 로 간다. 그래서 쓸 만한지(2)를 먼저 가른다.
    - 창이 끝나기 전이어도 그렇다.
 4. `evaluated_at < window.end_ms` → `PENDING / WINDOW_OPEN`.
 5. 창이 닫혔다.
-   - 모든 절이 쓸 만하고, 하나라도 값이 `in` 밖이다 → `NOT_VERIFIED / UNMET_AT_CLOSE`, final.
+   - 모든 절이 쓸 만하고, 하나라도 술어가 거짓이다 → `NOT_VERIFIED / UNMET_AT_CLOSE`, final.
    - 아니면 `UNKNOWN`, final. reason 은 `NO_POST_OBSERVATION` · `NOT_USABLE` · `TIME_BASE_MISMATCH` 가운데 해당하는 것이다.
    - "관측이 없다" 는 "효과가 없다" 가 아니다.
 
@@ -215,3 +216,13 @@ Health 몫이 아닌 줄:
    - MS `ToolSpec` 을 쓸까?
    - baseline 계약으로 둘까?
 6. **S6 과의 경계(§2.5)**: 받는가?
+
+---
+
+## 고침 (H1 보고 뒤)
+
+- **2026-10-02 · 사후조건 절의 꼴**: 처음 보고는 절을 `{entity, state, in}` 으로 새로 지었다.
+  - MS 를 읽기 전용으로 열어 보니(`8b9f292`) 이미 닫힌 술어 꼴 `[속성, 연산, 값]`(`ms/predicate.py`)이 있다. 사전조건(`tools.ToolSpec.preconditions`) · 파생 상태 · 질의가 이것을 쓴다.
+  - 그래서 절을 `{entity, pred}` 로 바꾸고 `pred` 는 그 꼴을 쓴다.
+  - 하나 다른 점이 있다. MS `holds` 는 값이 없으면 거짓이다. VERIFY 는 "쓸 만한가" 를 먼저 가른 뒤에 술어를 적용한다(§2.2-3).
+  - MS `ToolSpec` 에 사후조건 칸이 없음도 코드에서 확인했다. 칸은 `name` · `target_model` · `description` · `params` · `preconditions` · `risk` · `handler` · `effect` 다.
