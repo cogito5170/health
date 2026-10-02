@@ -32,6 +32,11 @@ L0 Telemetry ─► L1 Sensor (MEASURE · 탐지 판독) ─► L2 State (ESTIMA
 | BD-31 · BD-97 | VERIFY: ActionSpec 사후조건 · 시간 창을 그 뒤의 State 와 견줘 `action_state` 를 낸다. 입력 이름은 L0 `action.*`. 실행기가 선 뒤 |
 | DATA_FLOW §6.4 | 공통 원인 먼저(`observes` · `runs_on` · `uses`). 복구는 하나씩 검증한다 |
 
+## 문서
+
+- [`docs/BOUNDARY.md`](docs/BOUNDARY.md) — CMD-H1: ASSESS 표시 상태 여섯의 자리 · `VerificationRecord` 꼴 제안 · FDIR 줄. 제안이다
+- [`eval/assess_inventory.py`](eval/assess_inventory.py) — 위 판정의 근거를 Sensor 코드에서 뽑는 탐침(읽기 전용)
+
 ## 아직 하지 않은 것
 
 - 코드 · 시험 · 계약 — 없음. baseline 지시(CMD-H*)를 받은 뒤 짓는다.
