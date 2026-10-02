@@ -27,10 +27,23 @@ L0 Telemetry ─► L1 Sensor (MEASURE · 탐지 판독) ─► L2 State (ESTIMA
 | BD-35 | 건강 성격 상태(`execution_health` · `tool_execution_health` · `execution_interruption` · `runtime_reliability` · `answer_reliability` · `correction_rate`)는 이름 · 값 그대로, 소유 층 표시만 ASSESS |
 | BD-36 | `confidence{kind: none · ordinal · calibrated}` — 보정 전 Q 는 ordinal, Guard · 정책의 문턱으로 못 쓴다 |
 | BD-39 | 필수 예산이 빠진 배치는 ASSESS 의 설정 적합성 고장 상태 |
+| BD-99 | ASSESS 표시 상태 여섯은 모두 Sensor 의 탐지다. Health 는 Sensor state-export(+ 관계)만 읽는다. VERIFY 근거는 값 없이 참조 · 실체 `action:<run>:<command_id>` · 사후조건의 집은 DC `purpose.ActionSpec` · S6 = 실행됐나, VERIFY = 효과가 났나 |
 | BD-46 | MS 가 제안한 `outcome_confidence` · `false_success_risk` · `loop_risk` · `cost_anomaly` 는 Sensor(L1 · L2) 또는 Health 의 일 |
-| BD-52 | `liveness_state` 는 지금 Sensor 에 있다. Health 가 서면 그때 옮긴다 |
+| BD-52 → BD-99 | `liveness_state` 는 Sensor 에 남는다(BD-99 가 "옮긴다" 를 거둠). "대상이 죽었나 · 수집이 죽었나" 를 가르는 진단이 Health 몫 |
 | BD-31 · BD-97 | VERIFY: ActionSpec 사후조건 · 시간 창을 그 뒤의 State 와 견줘 `action_state` 를 낸다. 입력 이름은 L0 `action.*`. 실행기가 선 뒤 |
 | DATA_FLOW §6.4 | 공통 원인 먼저(`observes` · `runs_on` · `uses`). 복구는 하나씩 검증한다 |
+
+## 지금 있는 것
+
+- `health/verification.py` — VERIFY 기록 꼴 `verification-record/1` 과 순수 판정 함수 `verify` (CMD-H2). 계약: [`docs/VERIFICATION.md`](docs/VERIFICATION.md)
+- `health/predicate.py` — 사후조건 술어. MS `ms/predicate.py` 꼴 그대로(속성 참조 제외)
+- 의존: action 계약(`action-contract/1`) — 커밋 sha 고정, 필수. 그 밖에는 표준 라이브러리만
+
+```
+pip install -e .                       # action 계약을 고정 sha 로 받는다
+python3 -m unittest                    # 옆에 MS 가 있으면(../MS · MS_REPO) 술어 대조도 돈다
+python3 eval/mutation.py               # 변이가 모두 RED 여야 한다
+```
 
 ## 문서
 
@@ -39,7 +52,8 @@ L0 Telemetry ─► L1 Sensor (MEASURE · 탐지 판독) ─► L2 State (ESTIMA
 
 ## 아직 하지 않은 것
 
-- 코드 · 시험 · 계약 — 없음. baseline 지시(CMD-H*)를 받은 뒤 짓는다.
+- ASSESS(진단 · 격리) — 입력(관계 export · `observes`)이 서면 baseline 지시로 짓는다(BD-99).
+- `action_state` 를 State 로 내보내는 일 · 실데이터 VERIFY — 실행기 · ActionSpec 사후조건이 선 뒤.
 - 다른 저장소의 파일(Sensor · DC · MS · Telemetry · action)은 고치지 않는다. 필요하면 baseline 이슈에 `요청:` 으로 적는다.
 
 ## 통로

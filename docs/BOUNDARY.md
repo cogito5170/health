@@ -73,6 +73,8 @@ state-export `llmsensor.state-export/2` 의 함수는 `catalog` · `read` · `su
 
 ## 2. `VerificationRecord` 꼴 (제안 — `verification-record/1`)
 
+> **지었다(CMD-H2).** 굳은 계약은 [`VERIFICATION.md`](VERIFICATION.md) 다. BD-99 의 답과 다른 곳(V1–V5)은 그 문서 §5 에 있다. 아래는 H1 때의 제안 그대로 둔다.
+
 근거:
 - BD-31: ActionSpec 의 사후조건 · 검증 시간 창
 - SCHEMA_PROPOSAL §2.6: Verification = State `action_state`
